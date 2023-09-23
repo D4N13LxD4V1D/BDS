@@ -1,5 +1,0 @@
-; ModuleID = '3476900567878811119'
-
-define i32 @example(i32 %input) {
-example:
-}
