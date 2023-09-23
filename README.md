@@ -1,6 +1,6 @@
-# bds
+# BDS
 
-bds is a compiled programming language written in Rust using LLVM and peginator.
+BDS is a compiled programming language written in Rust using LLVM and peginator.
 
 # Syntax
 
