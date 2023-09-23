@@ -1,0 +1,54 @@
+@export
+File = [statements:StatementList] $;
+Interactive = compound_statement:CompoundStatement '\n' | simple_statements:SimpleStatementList | '\n' | $;
+Evaluated = expressions:ExpressionList {'\n'} $;
+FunctionType = '(' [type_expressions:TypeExpressionList] ')' '->' expression:Expression {'\n'} $;
+FormatString = star_expressions:StarExpressionList;
+
+StatementList = {statement:Statement}+;
+
+Statement = compound_statement:CompoundStatement | simple_statements:SimpleStatementList;
+
+SimpleStatementList = simple_statement:SimpleStatement !';' '\n' | simple_statement:SimpleStatement {';' simple_statement:SimpleStatement} [';'] '\n';
+
+SimpleStatement = assignment:Assignment | type_alias:TypeAlias | star_expressions:StarExpressionList | return_statement:ReturnStatement | import_statement:ImportStatement | raise_statement:RaiseStatement | 'pass' | delete_statement:DeleteStatement | yield_statement:YieldStatement | assert_statement:AssertStatement | 'break' | 'continue';
+
+CompoundStatement = function_definition:FunctionDefintion | if_statement:IfStatement | class_definition:ClassDefinition | with_statement:WithStatement | for_statement:ForStatement | try_statement:TryStatement | while_statement:WhileStatement | match_statement:MatchStatement;
+
+Assignment = identifier:Identifier ':' expression:Expression ['=' annotated_rhs:AnnotatedExpression] | ('(' single_target:SingleTarget ')' | single_subscript_attribute_target:SingleSubscriptAttributeTarget) ':' expression:Expression ['=' annotated_rhs:AnnotatedExpression] | {star_targets:StarTargetList '='}+ (yield_expression:YieldExpression | star_expressions:StarExpressionList);
+
+AnnotatedExpression = yield_expression:YieldExpression | star_expressions:StarExpressionList;
+
+AugmentedAssignment = '+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//=';
+
+ReturnStatement = 'return' [star_expressions:StarExpressionList];
+
+RaiseStatement = 'raise' expression:Expression ['from' expression:Expression] | 'raise';
+
+DeleteStatement = 'del' delete_targets:DeleteTargetList &(',' | '\n');
+
+YieldStatement = yield_expression:YieldExpression;
+
+AssertStatement = 'assert' expression:Expression [',' expression:Expression];
+
+ImportStatement = import_name:ImportName | import_from:ImportFrom;
+
+ImportName = 'import' dotted_as_names:DottedAsNameList;
+
+ImportFrom = 'from' {'.' | '...'} dotted_name:DottedName 'import' import_from_targets:ImportFromTargetList | 'from' {'.' | '...'} dotted_name:DottedName 'import' import_from_targets:ImportFromTargetList;
+
+ImportFromTargetList = '(' import_from_as_names:ImportFromAsNameList [','] ')' | import_from_as_names:ImportFromAsNameList !',' | '*';
+
+ImportFromAsNameList = import_from_as_name:ImportFromAsName {',' import_from_as_name:ImportFromAsName};
+
+ImportFromAsName = identifier:Identifier ['as' identifier:Identifier];
+
+DottedAsNameList = dotted_as_name:DottedAsName {',' dotted_as_name:DottedAsName};
+
+DottedAsName = dotted_name:DottedName ['as' identifier:Identifier];
+
+DottedName = dotted_name:DottedName '.' Identifier | Identifier;
+
+@string
+@no_skip_ws
+Identifier = ['a'..'z' | 'A'..'Z' | '_' | '0'..'9'];

@@ -1,0 +1,50 @@
+@export
+File = {statements:Statement};
+
+Statement = fn:FunctionDef | var:VariableDef | expr:Expression;
+
+FunctionDef = 'fn' name:Ident '(' param_list:ParamList ')' [ '->' return_value:Type ];
+
+ParamList = self_param:SelfParam {',' params:Param} | params:Param  {',' params:Param} | ;
+
+Param = name:Ident ':' typ: Type;
+
+SelfParam = [ref_type:ReferenceMarker] 'self';
+
+Type = [ref_type:ReferenceMarker] typename:Ident;
+
+ReferenceMarker = @:MutableReference | @:ImmutableReference;
+
+ImmutableReference = '&';
+MutableReference = '&' 'mut';
+
+VariableDef = 'let' name:Ident ':' typ:Type '=' expr:Expression;
+
+Expression = expr:BinaryExpression;
+
+BinaryExpression = left:UnaryExpression op:BinaryOperator right:UnaryExpression;
+
+UnaryExpression = op:UnaryOperator expr:PrimaryExpression;
+
+PrimaryExpression = expr:Literal | expr:Variable | expr:FunctionCall | expr:ParenExpression;
+
+ParenExpression = '(' {expr:Expression} ')';
+
+Variable = name:Ident;
+
+FunctionCall = name:Ident '(' args:ArgumentList ')';
+
+ArgumentList = arg:Expression {',' arg:Expression} | ;
+
+Literal = int:Integer | float:Float;
+
+Integer = {Digit}+;
+Float = {Digit}+ '.' {Digit}+;
+Digit = '0'..'9';
+
+BinaryOperator = '+' | '-' | '*' | '/' | '%' | '==' | '!=' | '<' | '>' | '<=' | '>=' | '&&' | '||';
+UnaryOperator = '+' | '-' | '!' | '*';
+
+@string
+@no_skip_ws
+Ident = {'a'..'z' | 'A'..'Z' | '_' | '0'..'9'};

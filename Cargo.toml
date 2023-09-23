@@ -1,0 +1,11 @@
+[package]
+name = "bds"
+version = "0.1.0"
+edition = "2021"
+
+[build-dependencies]
+peginator_codegen = "0.6.0"
+
+[dependencies]
+llvm-sys = "170.0.0"
+peginator = "0.6.0"
