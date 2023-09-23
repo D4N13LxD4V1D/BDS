@@ -17,15 +17,14 @@ pub struct Compiler {
     context: LLVMContextRef,
     module: LLVMModuleRef,
     builder: LLVMBuilderRef,
-    output: *mut i8,
 }
 
 impl Compiler {
     pub fn compile(filepath: &str, ast: File) {
         let compiler;
-        let filename = filepath.split(".").nth(0).unwrap();
-        let output = filename.to_owned() + ".bdsm";
-        let modulename = hash(filename);
+        let modulename = hash(filepath);
+        let fileinputname = filepath.split(".").nth(0).unwrap();
+        let fileoutputname = fileinputname.to_owned() + ".bdsm";
         unsafe {
             let context = LLVMContextCreate();
             let module = LLVMModuleCreateWithNameInContext(
@@ -35,26 +34,25 @@ impl Compiler {
             let builder = LLVMCreateBuilderInContext(context);
             LLVMSetSourceFileName(
                 module,
-                filename.as_ptr() as *const i8,
-                filename.len() as usize,
+                fileinputname.as_ptr() as *const i8,
+                fileinputname.len() as usize,
             );
             compiler = Compiler {
                 ast,
                 context,
                 module,
                 builder,
-                output: output.as_str().as_ptr() as *mut i8,
             };
         }
-        compiler.compile_file();
-    }
-
-    fn compile_file(&self) {
-        for stmt in &self.ast.statements {
-            self.compile_statement(stmt);
+        for stmt in &compiler.ast.statements {
+            compiler.compile_statement(stmt);
         }
         unsafe {
-            LLVMPrintModuleToFile(self.module, self.output, std::ptr::null_mut::<*mut i8>());
+            LLVMPrintModuleToFile(
+                compiler.module,
+                fileoutputname.as_str().as_ptr() as *const i8,
+                std::ptr::null_mut::<*mut i8>(),
+            );
         }
     }
 
